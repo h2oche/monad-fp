@@ -1,0 +1,32 @@
+## Basic ignore files
+*.class
+*.log
+*.iml
+*.ipr
+*.iws
+.idea
+out
+.cache/
+.history/
+.lib/
+dist/*
+target/
+libexec/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+logs/
+project/*-shim.sbt
+project/project/
+project/target/
+target/
+.scala_dependencies
+.worksheet
+*.swp
+*.swo
+.history
+
+## macOS
+.DS_Store
+
