@@ -17,3 +17,11 @@ basic evaluator for simple terms
 + exceptions
 + state
 + output
+
+Each of the variations on the intepreter has a similar structure, which may be
+abstracted to yield the notion of a *monad*.
+
+A monad is a triple (M, unit, >>=)
+- M[T] : type constructor
+- unit[T] : T -> M[T], which means how to wrap value to default computation
+- >>=[T, S] : M[T] -> (T -> M[S]) -> M[S], which means how to sequence two computations
