@@ -1,14 +1,10 @@
 package example
 
 object Evaluator {
-  trait Term
-  case class Const(i: Int) extends Term
-  case class Div(t0: Term, t1: Term) extends Term
-
-  trait Monad[C[_]] {
-    def pure[A](v: => A): C[A]
-    def flatMap[A, B](m: C[A])(f: A => C[B]): C[B]
-  }
+  // trait Monad[C[_]] {
+  //   def pure[A](v: => A): C[A]
+  //   def flatMap[A, B](m: C[A])(f: A => C[B]): C[B]
+  // }
 
   ////////////////////////////////////////////////////////////////////////////////
   // Variation0 : Basic Evaluator
@@ -151,7 +147,7 @@ object Evaluator {
   //     (r, out0 + out1 + line(t, r))
   //   }
   // }
-  
+
   ////////////////////////////////////////////////////////////////////////////////
   // Revisited3 : Output
   ////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +161,7 @@ object Evaluator {
     def map[T, S](m: Result[T])(f: T => S): Result[S] = m match {
       case Result(v, o) => Result(f(v), o)
     }
-    def flatMap[T, S](m : Result[T])(f: T => Result[S]): Result[S] = m match {
+    def flatMap[T, S](m: Result[T])(f: T => Result[S]): Result[S] = m match {
       case Result(v0, o0) => f(v0) match {
         case Result(v1, o1) => Result(v1, o0 + o1)
       }
