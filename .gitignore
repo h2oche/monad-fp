@@ -30,3 +30,5 @@ target/
 ## macOS
 .DS_Store
 
+## metals
+.metals

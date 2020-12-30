@@ -12,38 +12,46 @@ case class ParseResults[T](l: List[ParseResult[T]]) {
 }
 
 trait Parser[T] extends Function1[State, ParseResults[T]] {
-  def pure(v: T): Parser[T] = (st: State) => ParseResults(List(ParseResult(v, st)))
+  def pure(v: T): Parser[T] = (st: State) =>
+    ParseResults(List(ParseResult(v, st)))
   def map[S](f: T => S): Parser[S] = (st: State) => this(st).map(f)
-  def flatMap[S](f: T => Parser[S]): Parser[S] = (st: State) => this(st) match {
-    case ParseResults(l) => ParseResults(l.flatMap {
-      case ParseResult(res, remains) => f(res)(remains).l
-    })
-  }
+  def flatMap[S](f: T => Parser[S]): Parser[S] = (st: State) =>
+    this(st) match {
+      case ParseResults(l) =>
+        ParseResults(l.flatMap { case ParseResult(res, remains) =>
+          f(res)(remains).l
+        })
+    }
   def +(p: Parser[T]): Parser[T] = (st: State) => {
     val pres = this(st)
     if (!pres.l.isEmpty) pres else p(st)
   }
-  def ++(p: Parser[T]): Parser[T] = (st: State) => ParseResults(this(st).l ++ p(st).l)
-  def filter(pred: T => Boolean): Parser[T] = (st: State) => this(st).filter(pred)
+  def ++(p: Parser[T]): Parser[T] = (st: State) =>
+    ParseResults(this(st).l ++ p(st).l)
+  def filter(pred: T => Boolean): Parser[T] = (st: State) =>
+    this(st).filter(pred)
   lazy val rep: Parser[List[T]] = {
     val repParser: Parser[List[T]] = for (v <- this; l <- this.rep) yield v :: l
     repParser ++ Parser.pure(List.empty[T])
   }
   lazy val rep2: Parser[List[T]] = {
-    val repParser: Parser[List[T]] = for (v <- this; l <- this.rep2) yield v :: l
+    val repParser: Parser[List[T]] =
+      for (v <- this; l <- this.rep2) yield v :: l
     repParser + Parser.pure(List.empty[T])
   }
   def apply(s: String): ParseResults[T] = this(State(s))
 }
 
 object Parser {
-  def pure[T](v: T): Parser[T] = (st: State) => ParseResults(List(ParseResult(v, st)))
+  def pure[T](v: T): Parser[T] = (st: State) =>
+    ParseResults(List(ParseResult(v, st)))
   def zero[T]: Parser[T] = (st: State) => ParseResults(List())
 }
 
 object ItemParser extends Parser[Char] {
   def apply(st: State): ParseResults[Char] = ParseResults(st match {
-    case State(s) if s.length > 0 => List(ParseResult(s.charAt(0), State(s.substring(1))))
+    case State(s) if s.length > 0 =>
+      List(ParseResult(s.charAt(0), State(s.substring(1))))
     case _ => List()
   })
 }
@@ -63,8 +71,8 @@ object TwoItemParser extends Parser[(Char, Char)] {
 object OneOrTwoItemParser extends Parser[String] {
   def apply(st: State): ParseResults[String] = {
     val oneParser = ItemParser.map((a: Char) => a.toString)
-    val twoParser = TwoItemParser.map {
-      case (a, b) => a.toString + b.toString
+    val twoParser = TwoItemParser.map { case (a, b) =>
+      a.toString + b.toString
     }
     (oneParser ++ twoParser)(st)
   }
@@ -96,13 +104,14 @@ object NumberParser extends Parser[Int] {
 object TermParser extends Parser[Term] {
   def apply(st: State): ParseResults[Term] = {
     val constp: Parser[Term] = NumberParser.map(Const(_))
-    val divp: Parser[Term] = for (
-      _ <- LitParserGenerator('(');
-      t0 <- TermParser;
-      _ <- LitParserGenerator('/');
-      t1 <- TermParser;
-      _ <- LitParserGenerator(')')
-    ) yield Div(t0, t1)
+    val divp: Parser[Term] =
+      for (
+        _  <- LitParserGenerator('(');
+        t0 <- TermParser;
+        _  <- LitParserGenerator('/');
+        t1 <- TermParser;
+        _  <- LitParserGenerator(')')
+      ) yield Div(t0, t1)
     (constp ++ divp)(st)
   }
 }

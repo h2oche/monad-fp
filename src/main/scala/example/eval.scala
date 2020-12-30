@@ -153,7 +153,7 @@ object Evaluator {
   ////////////////////////////////////////////////////////////////////////////////
   type Output = String
   case class Result[+T](v: T, o: Output) {
-    def map[S](f: T => S): Result[S] = Result.map(this)(f)
+    def map[S](f: T => S): Result[S]             = Result.map(this)(f)
     def flatMap[S](f: T => Result[S]): Result[S] = Result.flatMap(this)(f)
   }
   object Result {
@@ -162,18 +162,20 @@ object Evaluator {
       case Result(v, o) => Result(f(v), o)
     }
     def flatMap[T, S](m: Result[T])(f: T => Result[S]): Result[S] = m match {
-      case Result(v0, o0) => f(v0) match {
-        case Result(v1, o1) => Result(v1, o0 + o1)
-      }
+      case Result(v0, o0) =>
+        f(v0) match {
+          case Result(v1, o1) => Result(v1, o0 + o1)
+        }
     }
   }
   def line(t: Term, r: Int): String = f"eval($t) => $r\n"
   def eval(t: Term): Result[Int] = t match {
     case Const(i) => Result(i, line(t, i))
-    case Div(t0, t1) => for (
-      r0 <- eval(t0);
-      r1 <- eval(t1);
-      r <- Result(r0 / r1, line(t, r0 / r1))
-    ) yield r
+    case Div(t0, t1) =>
+      for (
+        r0 <- eval(t0);
+        r1 <- eval(t1);
+        r  <- Result(r0 / r1, line(t, r0 / r1))
+      ) yield r
   }
 }

@@ -27,6 +27,8 @@ object Main extends App {
   // println(Parser("not a term"))
   // println(Parser("(1972/2)/23)"))
 
+  println("asdfasdf")
+
   println(ItemParser(""))
   println(ItemParser("monad"))
 
